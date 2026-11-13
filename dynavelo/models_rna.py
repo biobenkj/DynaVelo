@@ -715,7 +715,7 @@ class DynaVelo_RNA(nn.Module):
 
     def load(self, optimizer):
         if os.path.exists(self.ckpt_path):
-            checkpoint = torch.load(self.ckpt_path)
+            checkpoint = torch.load(self.ckpt_path, map_location=self.device)
             self.load_state_dict(checkpoint['model_state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
             print('Loaded ckpt from {}'.format(self.ckpt_path))
