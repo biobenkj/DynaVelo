@@ -22,6 +22,24 @@ else:
     #from torchsde import sdeint
 
 
+def _rsample(q):
+    """Reparameterised sample from a Beta posterior.
+
+    MPS has no Dirichlet sampler, so on MPS the draw is made on the CPU and moved
+    back; gradients still flow to the concentration parameters.
+    """
+    device = q.concentration1.device
+    if device.type == 'mps':
+        return distributions.Beta(q.concentration1.cpu(), q.concentration0.cpu()).rsample().to(device)
+    return q.rsample()
+
+
+def _ode_options(device):
+    """torchdiffeq keeps time in float64 by default, which MPS does not support."""
+    return {'dtype': torch.float32} if torch.device(device).type == 'mps' else None
+
+
+
 class MultiomeDataset(Dataset):
     """
     A custom dataset class for multi-omic data handling RNA and ATAC data.
@@ -428,7 +446,7 @@ class DynaVelo(nn.Module):
             alpha_t = self.alpha_t_net(ht)
             beta_t = self.beta_t_net(ht)
             qt = distributions.Beta(concentration1=alpha_t, concentration0=beta_t)
-            t_nn = qt.rsample()
+            t_nn = _rsample(qt)
 
             t_nn = t_nn.squeeze()
             t_sorted, indices = torch.sort(t_nn)
@@ -438,7 +456,7 @@ class DynaVelo(nn.Module):
 
             while len(t_non_unique)>0:
                     print('Repetitive time')
-                    t_nn = qt.rsample()
+                    t_nn = _rsample(qt)
                     t_nn = t_nn.squeeze()
                     t_sorted, indices = torch.sort(t_nn)
                     t = torch.cat((torch.tensor([0.]).to(self.device), t_sorted), dim=0)
@@ -449,6 +467,7 @@ class DynaVelo(nn.Module):
                             atol=1e-7,
                             rtol=1e-7,
                             method='dopri5',
+                            options=_ode_options(z0.device),
                         )
 
             t_reshaped = t.reshape([len(t), 1, 1])
@@ -510,6 +529,7 @@ class DynaVelo(nn.Module):
                                 atol=1e-7,
                                 rtol=1e-7,
                                 method='dopri5',
+                                options=_ode_options(z0.device),
                             )
 
                 t_reshaped = t.reshape([len(t), 1, 1])
@@ -533,6 +553,7 @@ class DynaVelo(nn.Module):
                             atol=1e-7,
                             rtol=1e-7,
                             method='dopri5',
+                            options=_ode_options(z0.device),
                         )
                     t_reshaped = t.reshape([len(t), 1, 1])
                     t_reshaped = t_reshaped.repeat(1, z_cell.shape[1], 1)
@@ -583,7 +604,7 @@ class DynaVelo(nn.Module):
             alpha_t = self.alpha_t_net(ht)
             beta_t = self.beta_t_net(ht)
             qt = distributions.Beta(concentration1=alpha_t, concentration0=beta_t)
-            t_nn = qt.rsample()
+            t_nn = _rsample(qt)
             t_mean = (alpha_t/(alpha_t+beta_t)).squeeze()
 
             t_nn = t_nn.squeeze()
@@ -594,7 +615,7 @@ class DynaVelo(nn.Module):
 
             while len(t_non_unique)>0:
                     print('Repetitive time')
-                    t_nn = qt.rsample()
+                    t_nn = _rsample(qt)
                     t_nn = t_nn.squeeze()
                     t_sorted, indices = torch.sort(t_nn)
                     t = torch.cat((torch.tensor([0.]).to(self.device), t_sorted), dim=0)
@@ -605,6 +626,7 @@ class DynaVelo(nn.Module):
                             atol=1e-7,
                             rtol=1e-7,
                             method='dopri5',
+                            options=_ode_options(z0.device),
                         )
 
             t_reshaped = t.reshape([len(t), 1, 1])
@@ -676,6 +698,7 @@ class DynaVelo(nn.Module):
                         atol=1e-9,
                         rtol=1e-9,
                         method='dopri8',
+                        options=_ode_options(z0.device),
                     )
 
         t_reshaped = t.reshape([len(t), 1, 1])
