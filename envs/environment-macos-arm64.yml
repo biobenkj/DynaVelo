@@ -1,0 +1,46 @@
+# DynaVelo environment for Apple Silicon Macs (osx-arm64), CPU or Apple GPU (MPS).
+#
+#   conda env create -f envs/environment-macos-arm64.yml
+#   conda activate dynavelo
+#
+# Ported from the original linux-64 / CUDA 11.3 lockfile, which stays at
+# environment.yml in the repository root. Direct dependencies keep the
+# versions that were in effect in that environment unless a comment says
+# otherwise; everything else is left to the solver so it can pick an arm64
+# build.
+name: dynavelo
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pip
+
+  # DynaVelo model (dynavelo/*.py)
+  - pytorch=2.7.1         # original 1.12.1: too old for MPS; functorch now ships inside PyTorch
+  - torchmetrics=0.11.1
+  - numpy=1.22.4
+  - scipy=1.10.1
+  - pandas=1.5.3
+
+  # Single-cell stack used by the notebooks
+  - scanpy=1.9.5
+  - anndata=0.10.2
+  - leidenalg=0.10.2      # original 0.8.10: its arm64 build cannot load against current libc++
+  - python-igraph=0.11.9  # original 0.9.11: leidenalg 0.10 needs igraph 0.10+
+  - umap-learn=0.5.4
+  - matplotlib-base=3.7.1
+  - matplotlib-venn=0.11.9
+  - seaborn=0.12.2
+  - numpy_groupies        # loompy dependency, kept in conda
+  - click                 # loompy dependency, kept in conda
+
+  # Jupyter
+  - ipykernel
+  - ipywidgets
+  - notebook
+
+  # Pure-Python packages whose pinned version is not on conda-forge
+  - pip:
+      - torchdiffeq==0.2.3
+      - scvelo==0.2.4
+      - loompy==3.0.7
