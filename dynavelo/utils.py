@@ -25,8 +25,7 @@ class LRScheduler():
                 mode='min',
                 patience=self.patience,
                 factor=self.factor,
-                min_lr=self.min_lr,
-                verbose=True
+                min_lr=self.min_lr
                 )
     def __call__(self, val_loss):
         self.lr_scheduler.step(val_loss)
