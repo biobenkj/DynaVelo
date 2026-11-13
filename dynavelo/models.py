@@ -470,8 +470,8 @@ class DynaVelo(nn.Module):
             y_pred = self.decoder_net_y(zy)
 
             # Jacobians:
-            Jx = vmap(jacrev(self.decoder_net_x))(zx)
-            Jy = vmap(jacrev(self.decoder_net_y))(zy)
+            Jx = vmap(jacfwd(self.decoder_net_x))(zx)
+            Jy = vmap(jacfwd(self.decoder_net_y))(zy)
 
             vx_pred = torch.bmm(Jx, vzx.unsqueeze(2)).squeeze()
             vy_pred = torch.bmm(Jy, vzy.unsqueeze(2)).squeeze()
@@ -550,8 +550,8 @@ class DynaVelo(nn.Module):
             y_pred = self.decoder_net_y(zy)
 
             # Jacobians:
-            Jx = vmap(jacrev(self.decoder_net_x))(zx)
-            Jy = vmap(jacrev(self.decoder_net_y))(zy)
+            Jx = vmap(jacfwd(self.decoder_net_x))(zx)
+            Jy = vmap(jacfwd(self.decoder_net_y))(zy)
 
             vx_pred = torch.bmm(Jx, vzx.unsqueeze(2)).squeeze()
             vy_pred = torch.bmm(Jy, vzy.unsqueeze(2)).squeeze()
@@ -626,8 +626,8 @@ class DynaVelo(nn.Module):
             y_pred = self.decoder_net_y(zy)
 
             # Jacobians:
-            Jx = vmap(jacrev(self.decoder_net_x))(zx)
-            Jy = vmap(jacrev(self.decoder_net_y))(zy)
+            Jx = vmap(jacfwd(self.decoder_net_x))(zx)
+            Jy = vmap(jacfwd(self.decoder_net_y))(zy)
 
             vx_pred = torch.bmm(Jx, vzx.unsqueeze(2)).squeeze()
             vy_pred = torch.bmm(Jy, vzy.unsqueeze(2)).squeeze()
@@ -694,8 +694,8 @@ class DynaVelo(nn.Module):
         y_pred = self.decoder_net_y(zy)
 
         # Jacobians:
-        Jx = vmap(jacrev(self.decoder_net_x))(zx)
-        Jy = vmap(jacrev(self.decoder_net_y))(zy)
+        Jx = vmap(jacfwd(self.decoder_net_x))(zx)
+        Jy = vmap(jacfwd(self.decoder_net_y))(zy)
 
         vx_pred = torch.bmm(Jx, vzx.unsqueeze(2)).squeeze()
         vy_pred = torch.bmm(Jy, vzy.unsqueeze(2)).squeeze()

@@ -382,7 +382,7 @@ class DynaVelo_RNA(nn.Module):
             x_pred = self.decoder_net_x(z)
 
             # Jacobians:
-            Jx = vmap(jacrev(self.decoder_net_x))(z)
+            Jx = vmap(jacfwd(self.decoder_net_x))(z)
 
             vx_pred = torch.bmm(Jx, vz.unsqueeze(2)).squeeze()
 
@@ -445,7 +445,7 @@ class DynaVelo_RNA(nn.Module):
             x_pred = self.decoder_net_x(z)
 
             # Jacobians:
-            Jx = vmap(jacrev(self.decoder_net_x))(z)
+            Jx = vmap(jacfwd(self.decoder_net_x))(z)
 
             vx_pred = torch.bmm(Jx, vz.unsqueeze(2)).squeeze()
 
@@ -502,7 +502,7 @@ class DynaVelo_RNA(nn.Module):
             x_pred = self.decoder_net_x(z)
 
             # Jacobians:
-            Jx = vmap(jacrev(self.decoder_net_x))(z)
+            Jx = vmap(jacfwd(self.decoder_net_x))(z)
 
             vx_pred = torch.bmm(Jx, vz.unsqueeze(2)).squeeze()
 
@@ -553,7 +553,7 @@ class DynaVelo_RNA(nn.Module):
         x_pred = self.decoder_net_x(z)
 
         # Jacobians:
-        Jx = vmap(jacrev(self.decoder_net_x))(z)
+        Jx = vmap(jacfwd(self.decoder_net_x))(z)
 
         vx_pred = torch.bmm(Jx, vz.unsqueeze(2)).squeeze()
 
